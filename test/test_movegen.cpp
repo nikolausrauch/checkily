@@ -5,6 +5,8 @@
 #include <chess/chess_format.h>
 #include <chess/move/movegen.h>
 
+#include <chrono>
+
 TEST(move_generation, pseudo_legal_all)
 {
     using namespace chess;
@@ -160,6 +162,13 @@ void perft(unsigned int depth, chess::game_board& board, perft_result& result,
     }
 }
 
+#define TIME_FUNC(func, depth) \
+    auto start = std::chrono::high_resolution_clock::now(); \
+    func; \
+    auto end = std::chrono::high_resolution_clock::now(); \
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count(); \
+    std::cout << "Elapsed Time depth = " << depth << " : " << duration << " ms" << std::endl;
+
 TEST(move_generation, perft_startpos)
 {
     using namespace chess;
@@ -167,20 +176,21 @@ TEST(move_generation, perft_startpos)
     game_board board;
     EXPECT_TRUE(load_fen(board, "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq"));
 
-    std::array< perft_result, 6 > result =
+    std::array< perft_result, 7 > result =
     {{
-        {      1,     0,   0, 0, 0},
-        {     20,     0,   0, 0, 0},
-        {    400,     0,   0, 0, 0},
-        {   8902,    34,   0, 0, 0},
-        { 197281,  1576,   0, 0, 0},
-        {4865609, 82719, 258, 0, 0 }
+        {       1,        0,    0, 0, 0},
+        {      20,        0,    0, 0, 0},
+        {     400,        0,    0, 0, 0},
+        {    8902,       34,    0, 0, 0},
+        {  197281,     1576,    0, 0, 0},
+        { 4865609,    82719,  258, 0, 0},
+        {119060324, 2812008, 5248, 0, 0}
     }};
 
     for(auto depth = 0u; depth < result.size(); depth++)
     {
         perft_result counter{0, 0, 0, 0, 0};
-        perft(depth, board, counter);
+        TIME_FUNC(perft(depth, board, counter), depth);
 
         EXPECT_EQ(counter, result[depth]);
     }
@@ -193,20 +203,20 @@ TEST(move_generation, perft_kiwipete)
     game_board board;
     EXPECT_TRUE(load_fen(board, "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - "));
 
-    std::array< perft_result, 5 > result =
+    std::array< perft_result, 6 > result =
     {{
         {         1,       0,      0,       0,     0},
         {        48,       8,      0,       2,     0},
         {      2039,     351,      1,      91,     0},
         {     97862,    17102,    45,    3162,     0},
         {   4085603,   757163,  1929,  128013, 15172},
-        //{ 193690690, 35043416, 73365, 4993637,  8392}
+        { 193690690, 35043416, 73365, 4993637,  8392}
     }};
 
     for(auto depth = 0u; depth < result.size(); depth++)
     {
         perft_result counter{0, 0, 0, 0, 0};
-        perft(depth, board, counter);
+        TIME_FUNC(perft(depth, board, counter), depth);
 
         EXPECT_EQ(counter, result[depth]);
     }
