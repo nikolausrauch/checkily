@@ -6,6 +6,7 @@
 
 #include <array>
 #include <string>
+#include <vector>
 
 namespace chess
 {
@@ -37,7 +38,7 @@ public:
 
 private:
     game_bitboards m_bitboards{0ull, 0ull, 0ull, 0ull, 0ull, 0ull,
-                                                         0ull, 0ull, 0ull, 0ull, 0ull, 0ull};
+                               0ull, 0ull, 0ull, 0ull, 0ull, 0ull};
 
     game_occupancy m_occupancies{0ull, 0ull, 0ull};
 
@@ -47,6 +48,7 @@ private:
 
 
     friend bool load_fen(game_board&, const std::string&);
+    friend bool load_fen(game_board&, const std::vector<std::string>&);
 };
 
 }

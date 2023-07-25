@@ -16,6 +16,10 @@ enum square : unsigned int
     not_a_square,
     square_count = not_a_square
 };
+inline constexpr int rank_square(square sq) { return sq / 8; }
+inline constexpr int file_square(square sq) { return sq % 8; }
+inline constexpr square mirror_square(square sq) { return static_cast<square>( (7 - rank_square(sq)) * 8 + file_square(sq) ); }
+inline constexpr square flip_square(square sq) { return static_cast<square>( (7 - rank_square(sq)) * 8 + (7 - file_square(sq)) ); }
 
 
 enum color : int

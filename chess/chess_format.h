@@ -15,6 +15,7 @@ bool is_valid_fen(const std::string& str);
 bool is_valid_fen(const std::vector<std::string>& str_tokens);
 
 bool load_fen(game_board& board, const std::string &str);
+bool load_fen(game_board& board, const std::vector<std::string> &str_tokens);
 std::string to_fen_string(const game_board& board);
 
 }

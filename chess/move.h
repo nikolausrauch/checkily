@@ -34,8 +34,6 @@ struct __attribute__((packed)) move
 };
 static_assert(sizeof(move) == sizeof(unsigned int), "Move does not have size of an integer!");
 
-
-
 enum move_flags
 {
     no_move_flag = 0,
@@ -60,5 +58,6 @@ constexpr move encode_move(const int from, const int to, const int man, const in
 }
 
 using move_list = std::vector<move>;
+inline static constexpr chess::move illegal_move = chess::encode_move(0, 0, 0, 0, 0, 0);
 
 }

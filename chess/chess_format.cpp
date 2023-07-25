@@ -63,9 +63,14 @@ bool is_valid_fen(const std::vector<std::string>& str_tokens)
 
 bool load_fen(game_board& board, const std::string& str)
 {
+    auto tokens = detail::tokenize(str);
+    return load_fen(board, tokens);
+}
+
+bool load_fen(game_board &board, const std::vector<std::string> &tokens)
+{
     board = game_board();
 
-    auto tokens = detail::tokenize(str);
     if(!is_valid_fen(tokens)) { return false; }
 
     /********** piece positions (set bitboards) **********/
