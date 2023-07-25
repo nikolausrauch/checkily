@@ -53,6 +53,11 @@ add_compile_options("$<$<AND:$<CXX_COMPILER_ID:MSVC>,$<CONFIG:RELEASE>>:${MSVC_C
 add_subdirectory(chess)
 
 #########################################
+#           Build Chess Engine          #
+#########################################
+add_subdirectory(engine)
+
+#########################################
 #           Build Google Tests          #
 #########################################
 if(BUILD_TESTS)
