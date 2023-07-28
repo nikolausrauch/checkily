@@ -26,7 +26,7 @@ enum class table_names
 template <table_names Name>
 struct eval_table;
 
-
-using evaluation_func = score (const chess::game_board &board);
+template <table_names Table>
+struct evaluation_func;
 
 }

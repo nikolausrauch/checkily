@@ -103,6 +103,7 @@ constexpr piece_square_table king_end =
 
 template<> struct eval_table<table_names::michniewski>
 {
+    static constexpr score mating_score = -5000;
     static constexpr material_score material = michniewski::material;
     static constexpr postion_score position =
     {

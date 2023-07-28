@@ -2,15 +2,14 @@
 
 #include "engine/iface/iface_string.h"
 
-#include <chess/chess_format.h>
-#include <chess/chess_string.h>
-#include <chess/move/movegen.h>
-
-// DEBUG TODO: relative paths?
 #include "engine/eval/table_codemonkeyking.h"
 #include "engine/eval/table_michniewski.h"
 #include "engine/eval/eval_table.h"
 #include "engine/search/negamax.h"
+
+#include <chess/chess_format.h>
+#include <chess/chess_string.h>
+#include <chess/move/movegen.h>
 
 #include <cassert>
 #include <iostream>
@@ -35,7 +34,7 @@ void ckly::iface::cli::run()
 
         if(tokens[0] == "go")
         {
-            auto mv = ckly::best_move< evaluate<table_names::michniewski> >(m_board, 6);
+            auto mv = ckly::best_move< evaluation_func<table_names::michniewski> >(m_board, 6);
             std::cout << "checkily plays: " << parse_move(mv) << std::endl;
 
             m_board.make(mv);

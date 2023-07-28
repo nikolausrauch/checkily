@@ -117,7 +117,7 @@ void uci::run()
         if(tokens[0] == "go")
         {
 
-            auto mv = ckly::best_move< evaluate<table_names::michniewski> >(m_board, 6);
+            auto mv = ckly::best_move< evaluation_func<table_names::michniewski> >(m_board, 6);
             std::cout << parse_move(mv) << std::endl;
 
             //            go

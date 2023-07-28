@@ -91,6 +91,7 @@ constexpr piece_square_table king =
 
 template<> struct eval_table<table_names::codemonkeyking>
 {
+    static constexpr score mating_score = -4900;
     static constexpr material_score material = codemonkeyking::material;
     static constexpr postion_score position =
     {
