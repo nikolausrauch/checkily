@@ -23,7 +23,7 @@ score negamax(chess::game_board& board, score alpha, score beta, int ply, int de
     if(mvs.empty())
     {
         // https://www.stmintz.com/ccc/index.php?id=469728
-        if(board.check()) { return -EvalFunc::mating_score() + ply; }
+        if(board.check()) { return EvalFunc::mating_score() + ply; }
         else { return 0; }
     }
 
