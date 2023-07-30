@@ -8,7 +8,7 @@ The primary goal is to implement a simple and understandable chess engine in C++
 The project is split into:
 - [`chess`](https://github.com/nikolausrauch/checkily/tree/main/chess) library containing the logic of chess (board representation and move generation).
 - [`engine`](https://github.com/nikolausrauch/checkily/tree/main/engine) the checkily library (and UCI capable executable) containing the engine
-- [`gui`]() a SMFL based graphical user interface to play against any engine supporting UCI
+- [`gui`](https://github.com/nikolausrauch/checkily/tree/main/gui) a SMFL based graphical user interface to play against any engine supporting UCI
 
 > For examples and usage of executables check the README in the respective folders.
 
@@ -29,7 +29,7 @@ The project is split into:
     - [ ] tapered evaluation
     - [ ] pawn advantage
     - [ ] transposition tables
-- [ ] Graphical User Interface
+- [x] Graphical User Interface 
 
 # :books: Useful Resources
 [Chess Programming - Bitboard CHESS ENGINE in C](https://youtube.com/playlist?list=PLmN0neTso3Jxh8ZIylk74JpwfiWNI76Cs)   

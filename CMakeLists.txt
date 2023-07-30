@@ -58,6 +58,11 @@ add_subdirectory(chess)
 add_subdirectory(engine)
 
 #########################################
+#             Build Chess Gui           #
+#########################################
+add_subdirectory(gui)
+
+#########################################
 #           Build Google Tests          #
 #########################################
 if(BUILD_TESTS)
