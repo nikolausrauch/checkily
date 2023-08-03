@@ -23,6 +23,9 @@ constexpr std::array<const char*, square::square_count + 1> square_names =
     "none"
 };
 
+constexpr std::array<char, 8> rank_names = {'8', '7', '6', '5', '4', '3', '2', '1'};
+constexpr std::array<char, 8> file_names = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'};
+
 constexpr std::array<char, piece::piece_count + 1> piece_names =
 {
     'P', 'N', 'K', 'B', 'R', 'Q',
@@ -49,6 +52,7 @@ std::string to_string(const bitboard bboard);
 std::string to_string(const game_board& board);
 std::string to_string(const move mv);
 std::string to_string(const move_list& mv_list);
+std::string to_notation_string(const move mv, const bool check, const bool checkmate);
 std::array<char, 64> to_char_array(const game_board& board);
 
 }

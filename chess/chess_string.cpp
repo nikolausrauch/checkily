@@ -119,4 +119,29 @@ std::string to_string(const move_list& mv_list)
     return ss.str();
 }
 
+std::string to_notation_string(const move mv, const bool check, const bool checkmate)
+{
+    auto man = color_discard(mv.m_piece);
+
+    std::stringstream ss;
+    if(mv.m_castling)
+    {
+        ss << ( (file_square(mv.m_to) == 2) ? "O-O-O" : "O-O");
+        return ss.str();
+    }
+
+    if(man != piece::pawn) { ss << piece_names[man]; }
+    if(mv.m_capture != not_a_piece)
+    {
+        if(man == piece::pawn) { ss << file_names[file_square(mv.m_from)]; }
+        ss << "x";
+    }
+    ss << square_names[mv.m_to];
+
+    if(check) { ss << "+"; }
+    if(checkmate) { ss << "#"; }
+
+    return ss.str();
+}
+
 }

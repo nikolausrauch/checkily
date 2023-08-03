@@ -37,6 +37,7 @@ enum piece : unsigned int
     b_pawn = 6, b_knight = 7, b_king = 8, b_bishop = 9, b_rook = 10, b_queen = 11,
     not_a_piece = 12, piece_count = 12
 };
+inline constexpr piece color_discard(const piece man) { return static_cast<piece>(man % 6); }
 inline constexpr piece color_piece(const color player, const piece man) { return static_cast<piece>(player*6 + man); }
 inline constexpr color color_of(const piece man) { return static_cast<color>(man / 6); }
 
