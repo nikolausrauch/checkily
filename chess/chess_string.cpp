@@ -138,8 +138,8 @@ std::string to_notation_string(const move mv, const bool check, const bool check
     }
     ss << square_names[mv.m_to];
 
-    if(check) { ss << "+"; }
     if(checkmate) { ss << "#"; }
+    else if(check) { ss << "+"; }
 
     return ss.str();
 }
