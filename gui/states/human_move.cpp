@@ -95,6 +95,12 @@ void human_move_handler::on_render()
     renderer.render_piece(m_piece, mouse_pos);
 }
 
+void human_move_handler::on_gui()
+{
+    auto& gui = m_app.gui();
+    gui.render_gameinfo();
+}
+
 void human_move_handler::set_params(chess::piece piece, chess::square square)
 {
     m_piece = piece;

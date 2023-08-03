@@ -3,22 +3,35 @@
 #include "states/human_turn.h"
 #include "states/human_move.h"
 
+#include <glad/glad.h>
+#include <SFML/OpenGL.hpp>
 #include <SFML/Window/Event.hpp>
 
 #include <cassert>
+#include <iostream>
 
 chess_app::chess_app(const config& configs)
     : m_configs(configs),
       m_window(sf::VideoMode{
-               (2*configs.border_offset.x + configs.square_size.x*8) * configs.scale_board,
+               (2*configs.border_offset.x + configs.square_size.x*8) * configs.scale_board + configs.gui_size,
                (2*configs.border_offset.y + configs.square_size.y*8) * configs.scale_board}, "checkily")
 {
+    m_window.setVerticalSyncEnabled(true);
     m_window.setKeyRepeatEnabled(false);
+    m_window.clear(sf::Color(39, 37, 34));
+    m_window.display();
+
+    /* initialize extension wrangler */
+    if(!gladLoadGL())
+    {
+        std::cerr << "Failed to initialize OpenGL Context (GLAD)!" << std::endl;
+    }
 
     /******************** modules ********************/
     m_game_module = std::make_unique<game_module>(*this);
     m_render_module = std::make_unique<render_module>(*this);
     m_sound_module = std::make_unique<sound_module>(*this);
+    m_gui_module = std::make_unique<gui_module>(*this);
 
     /******************** setup states ********************/
     m_state_machine.register_handler<human_turn_handler>(state::human_turn, *this);
@@ -59,6 +72,12 @@ sound_module& chess_app::sound()
     return *m_sound_module;
 }
 
+gui_module& chess_app::gui()
+{
+    assert(m_gui_module);
+    return *m_gui_module;
+}
+
 state_machine<state>& chess_app::states()
 {
     return m_state_machine;
@@ -66,6 +85,8 @@ state_machine<state>& chess_app::states()
 
 void chess_app::run()
 {
+    sf::Clock timer;
+
     while(m_window.isOpen())
     {
         sf::Event event;
@@ -85,13 +106,21 @@ void chess_app::run()
             }
 
             m_state_machine.current_handler().on_event(event);
+            m_gui_module->on_event(event);
         }
 
+        float dt = timer.restart().asSeconds();
         m_state_machine.current_handler().on_update();
 
-        m_window.clear();
+        m_window.clear(sf::Color(39, 37, 34));
         {
             m_state_machine.current_handler().on_render();
+
+            m_gui_module->start(dt);
+            {
+                m_state_machine.current_handler().on_gui();
+            }
+            m_gui_module->end();
         }
         m_window.display();
     }

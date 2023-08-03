@@ -92,10 +92,11 @@ void render_module::render_scale(float scale)
 
     if(m_sprites[sprite_id::sprite_board].getTexture() != nullptr)
     {
+        auto& config = m_app.configs();
         auto& render_window = m_app.render_window();
         auto board_size = sf::Vector2f(m_textures[tex_id::tex_board].getSize());
-        render_window.setSize(sf::Vector2u(scale*board_size.x, scale*board_size.y));
-        render_window.setView(sf::View({0.0f, 0.0f, scale*board_size.x, scale*board_size.y}));
+        render_window.setSize(sf::Vector2u(scale*board_size.x + config.gui_size, scale*board_size.y));
+        render_window.setView(sf::View({0.0f, 0.0f, scale*board_size.x + config.gui_size, scale*board_size.y}));
     }
 }
 

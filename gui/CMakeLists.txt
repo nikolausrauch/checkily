@@ -22,15 +22,15 @@ find_package( OpenGL 3.0 REQUIRED )
 
 if(SFML_BUILD_SOURCE)
     add_subdirectory(external/SFML-2.6.0)
-
     if(WIN32)
         file(COPY external/SFML-2.6.0/extlibs/bin/x64/openal32.dll DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
     endif()
-
 else()
     find_package( SFML 2.6 COMPONENTS system window graphics REQUIRED )
 endif()
 
+add_subdirectory(external/glad)
+add_subdirectory(external/imgui)
 
 #################################
 #       Source Files Game       #
@@ -42,6 +42,7 @@ set( GAME_SRC
     "${CMAKE_CURRENT_SOURCE_DIR}/render_module.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/game_module.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/sound_module.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/gui_module.cpp"
 
     "${CMAKE_CURRENT_SOURCE_DIR}/states/human_turn.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/states/human_move.cpp"
@@ -52,6 +53,7 @@ set( GAME_HDR
     "${CMAKE_CURRENT_SOURCE_DIR}/render_module.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/game_module.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/sound_module.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/gui_module.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/state_machine.h"
 
     "${CMAKE_CURRENT_SOURCE_DIR}/states/state.h"
@@ -70,7 +72,9 @@ add_executable( chess_gui ${GAME_SRC} ${GAME_HDR} )
 target_link_libraries( chess_gui
     chess_engine
     Threads::Threads OpenGL::GL
-    sfml-system sfml-window sfml-graphics sfml-audio )
+    sfml-system sfml-window sfml-graphics sfml-audio
+    glad imgui
+)
 
 
 target_include_directories( chess_gui PUBLIC

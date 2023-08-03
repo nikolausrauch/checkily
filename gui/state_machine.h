@@ -15,6 +15,7 @@ struct state_abstract
     virtual void on_exit() = 0;
     virtual void on_update() = 0;
     virtual void on_render() = 0;
+    virtual void on_gui() = 0;
     virtual void on_event(const sf::Event& event) = 0;
 };
 
@@ -26,6 +27,7 @@ struct state_wrapper : public state_abstract
     void on_exit() override { m_type.on_exit(); }
     void on_update() override { m_type.on_update(); }
     void on_render() override { m_type.on_render(); }
+    void on_gui() override { m_type.on_gui(); }
     void on_event(const sf::Event& event) override { m_type.on_event(event); }
 
     template <typename... Args>
@@ -56,6 +58,7 @@ struct state_handler
     void on_exit() { m_type->on_exit(); }
     void on_update() { m_type->on_update(); }
     void on_render() { m_type->on_render(); }
+    void on_gui() { m_type->on_gui(); }
     void on_event(const sf::Event& event) { m_type->on_event(event); }
 
 private:

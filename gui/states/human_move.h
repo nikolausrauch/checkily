@@ -15,6 +15,7 @@ public:
     void on_exit();
     void on_event(const sf::Event& t_event);
     void on_render();
+    void on_gui();
     void set_params(chess::piece t_piece, chess::square t_square);
 
 private:

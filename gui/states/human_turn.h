@@ -14,6 +14,7 @@ public:
     void on_exit();
     void on_event(const sf::Event& t_event);
     void on_render();
+    void on_gui();
     void set_params(chess::color t_player);
 
 private:

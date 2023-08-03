@@ -56,6 +56,12 @@ void human_turn_handler::on_render()
     renderer.render_pieces();
 }
 
+void human_turn_handler::on_gui()
+{
+    auto& gui = m_app.gui();
+    gui.render_gameinfo();
+}
+
 void human_turn_handler::set_params(chess::color t_player)
 {
     m_player = t_player;
