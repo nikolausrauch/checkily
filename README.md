@@ -12,5 +12,7 @@ The project is split into:
 
 > For examples and planned features check the README in the respective folders.
 
-### First version of checkily getting trashed by stockfish (default settings, depth=6) in the [`gui`](https://github.com/nikolausrauch/checkily/tree/main/gui)
+---
+
+First version of checkily getting trashed by stockfish (default settings, depth=6) in the [`gui`](https://github.com/nikolausrauch/checkily/tree/main/gui)
 ![checkily_stockfish](https://github.com/nikolausrauch/checkily/assets/13553309/e712cce2-90a0-4ade-9f86-4fd842969fab)
