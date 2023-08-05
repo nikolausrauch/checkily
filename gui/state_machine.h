@@ -13,7 +13,7 @@ struct state_abstract
     virtual ~state_abstract() = default;
     virtual void on_enter() = 0;
     virtual void on_exit() = 0;
-    virtual void on_update() = 0;
+    virtual void on_update(float dt) = 0;
     virtual void on_render() = 0;
     virtual void on_gui() = 0;
     virtual void on_event(const sf::Event& event) = 0;
@@ -25,7 +25,7 @@ struct state_wrapper : public state_abstract
     explicit state_wrapper(T type) : m_type(type) {}
     void on_enter() override { m_type.on_enter(); }
     void on_exit() override { m_type.on_exit(); }
-    void on_update() override { m_type.on_update(); }
+    void on_update(float dt) override { m_type.on_update(dt); }
     void on_render() override { m_type.on_render(); }
     void on_gui() override { m_type.on_gui(); }
     void on_event(const sf::Event& event) override { m_type.on_event(event); }
@@ -56,7 +56,7 @@ struct state_handler
 
     void on_enter() { m_type->on_enter(); }
     void on_exit() { m_type->on_exit(); }
-    void on_update() { m_type->on_update(); }
+    void on_update(float dt) { m_type->on_update(dt); }
     void on_render() { m_type->on_render(); }
     void on_gui() { m_type->on_gui(); }
     void on_event(const sf::Event& event) { m_type->on_event(event); }

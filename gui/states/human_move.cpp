@@ -17,7 +17,7 @@ void human_move_handler::on_enter()
 
 }
 
-void human_move_handler::on_update()
+void human_move_handler::on_update(float dt)
 {
 
 }
@@ -57,17 +57,23 @@ void human_move_handler::on_event(const sf::Event& event)
             return;
         }
 
-        game.make_move(*it);
+        /* game over by on board result */
+        if(game.make_move(*it) != game_module::result::unknown)
+        {
+            statemachine.transition(state::game_over);
+            return;
+        }
 
         /* transition to opponent turn */
-        if(game.game_mode() == game_module::mode::human_vs_human)
+        auto& other_player = game.player_info(game.board().player_move());
+        if(other_player.is_ai())
         {
-            statemachine.handler(state::human_turn).set_params<human_turn_handler>(game.board().player_move());
-            statemachine.transition(state::human_turn);
+            statemachine.transition(state::ai_turn);
         }
         else
         {
-            statemachine.transition(state::ai_turn);
+            statemachine.handler(state::human_turn).set_params<human_turn_handler>(game.board().player_move());
+            statemachine.transition(state::human_turn);
         }
     }
 
@@ -92,7 +98,7 @@ void human_move_handler::on_render()
     renderer.render_square_select(m_from);
     renderer.render_pieces(m_from);
     renderer.render_moves(m_possible_moves);
-    renderer.render_piece(m_piece, mouse_pos);
+    renderer.render_piece_mouse(m_piece, mouse_pos);
 }
 
 void human_move_handler::on_gui()

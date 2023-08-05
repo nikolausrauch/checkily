@@ -118,7 +118,7 @@ void uci::run()
         {
 
             auto mv = ckly::best_move< evaluation_func<table_names::michniewski> >(m_board, 6);
-            std::cout << parse_move(mv) << std::endl;
+            std::cout << "bestmove " << parse_move(mv) << std::endl;
 
             //            go
             //                start calculating on the current position set up with the "position" command.

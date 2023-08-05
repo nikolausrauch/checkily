@@ -2,12 +2,10 @@
 
 #include "state.h"
 
-#include <chess/chess.h>
-
-class human_turn_handler
+class new_game_handler
 {
 public:
-    human_turn_handler(chess_app& app);
+    new_game_handler(chess_app& app);
 
     void on_enter();
     void on_update(float dt);
@@ -15,9 +13,7 @@ public:
     void on_event(const sf::Event& t_event);
     void on_render();
     void on_gui();
-    void set_params(chess::color t_player);
 
 private:
     chess_app& m_app;
-    chess::color m_player;
 };

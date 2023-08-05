@@ -1,6 +1,8 @@
 #include "gui_module.h"
 
 #include "chess_app.h"
+#include "states/ai_turn.h"
+#include "states/human_turn.h"
 
 #include <chess/chess_string.h>
 
@@ -16,6 +18,20 @@
 #include <SFML/Graphics/Texture.hpp>
 
 #include <imgui/imgui.h>
+#include <iostream>
+
+namespace detail
+{
+
+void center_text(const std::string& text)
+{
+    auto windowWidth = ImGui::GetWindowSize().x;
+    auto textWidth   = ImGui::CalcTextSize(text.c_str()).x;
+    ImGui::SetCursorPosX((windowWidth - textWidth) * 0.5f);
+    ImGui::Text("%s", text.c_str());
+}
+
+}
 
 gui_module::gui_module(chess_app& app)
     : m_app(app),
@@ -26,8 +42,6 @@ gui_module::gui_module(chess_app& app)
     auto* context = ImGui::CreateContext();
     ImGui::SetCurrentContext(context);
     ImGui::StyleColorsDark();
-    auto& style = ImGui::GetStyle();
-//    style.FrameBorderSize = 1.0f;
 
     m_im_context = context;
 
@@ -297,7 +311,7 @@ void gui_module::render_gameinfo()
     auto& window = m_app.render_window();
     auto& game = m_app.game();
 
-    render_playerinfo(game.player_black(), sf::Vector2f{static_cast<float>(window.getSize().x - config.gui_size), 0.0f});
+    render_playerinfo(game.player_info(chess::black), sf::Vector2f{static_cast<float>(window.getSize().x - config.gui_size), 0.0f});
 
     ImGui::SetNextWindowPos(ImVec2(window.getSize().x - config.gui_size, 128.0f));
     ImGui::SetNextWindowSize(ImVec2(config.gui_size, window.getSize().y - 2 * 128.0f));
@@ -307,7 +321,7 @@ void gui_module::render_gameinfo()
         ImGui::PushStyleColor(ImGuiCol_Text, ImVec4{0.76f, 0.76f, 0.75f, 1.0f});
 
         ImGui::BeginTable("Moves", 3, ImGuiTableFlags_RowBg);
-        ImGui::TableSetupColumn("##turn", ImGuiTableColumnFlags_WidthFixed, 32, 0);
+        ImGui::TableSetupColumn("##turn", ImGuiTableColumnFlags_WidthFixed, 48, 0);
         ImGui::TableSetupColumn("##white", ImGuiTableColumnFlags_WidthFixed, 84, 1);
         ImGui::TableSetupColumn("##black", ImGuiTableColumnFlags_WidthFixed, 84, 2);
         ImGui::TableNextRow(ImGuiTableRowFlags_None, 32);
@@ -332,8 +346,13 @@ void gui_module::render_gameinfo()
                 auto& mv = moves[i++];
                 ImGui::TableSetColumnIndex(2);
                 ImGui::Button(chess::to_notation_string(mv.m_move, mv.m_check, mv.m_checkmate).c_str(), {84, 32});
-                ImGui::TableNextRow(ImGuiTableRowFlags_None, 32);
+                if(i != moves.size()) { ImGui::TableNextRow(ImGuiTableRowFlags_None, 32); }
             }
+        }
+
+        if (ImGui::GetScrollY() >= (ImGui::GetScrollMaxY() - 16))
+        {
+            ImGui::SetScrollHereY(1.0f);
         }
 
         ImGui::EndTable();
@@ -342,10 +361,10 @@ void gui_module::render_gameinfo()
     }
     ImGui::End();
 
-    render_playerinfo(game.player_white(), sf::Vector2f{static_cast<float>(window.getSize().x - config.gui_size), window.getSize().y - 128.0f});
+    render_playerinfo(game.player_info(chess::white), sf::Vector2f{static_cast<float>(window.getSize().x - config.gui_size), window.getSize().y - 128.0f});
 }
 
-void gui_module::render_playerinfo(const game_module::Player& player, const sf::Vector2f& pos)
+void gui_module::render_playerinfo(const game_module::player& player, const sf::Vector2f& pos)
 {
     auto& config = m_app.configs();
     auto& render = m_app.render();
@@ -353,25 +372,154 @@ void gui_module::render_playerinfo(const game_module::Player& player, const sf::
 
     ImGui::SetNextWindowPos(ImVec2(pos.x, pos.y));
     ImGui::SetNextWindowSize(ImVec2(config.gui_size, 128.0f));
-    ImGui::Begin(player.m_name.c_str(), nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground);
+    std::string window_id = player.name() + chess::player_names[player.color()];
+    ImGui::Begin(window_id.c_str(), nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground);
     {
         ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, {-36.0f, 0.0f});
 
-        ImGui::Text("%s", player.m_name.c_str());
-        for(unsigned int i = 0; i < player.m_captured.size(); i++)
+        ImGui::Text("%s", player.name().c_str());
+        const auto& captured = player.captured();
+        for(unsigned int i = 0; i < captured.size(); i++)
         {
             auto piece = static_cast<chess::piece>(i);
             const auto& sprite = render.sprite_piece(piece);
-            for(int c = 0; c < player.m_captured[i]; c++)
+            for(int c = 0; c < captured[i]; c++)
             {
-                render_sprite(sprite, {48, 48}); ImGui::SameLine(0.0f, (c < player.m_captured[i]-1) ? -1.0f : 0.0f);
+                render_sprite(sprite, {48, 48}); ImGui::SameLine(0.0f, (c < captured[i]-1) ? -1.0f : 0.0f);
             }
         }
 
-        auto material = game.material_imbalance(player);
+        auto material = game.material_imbalance(player.color());
         if(material > 0) { ImGui::TextColored({0.76f, 0.76f, 0.75f, 1.0f}, "+%d", material); }
 
         ImGui::PopStyleVar();
+    }
+    ImGui::End();
+}
+
+void gui_module::render_newgame()
+{
+    auto& game = m_app.game();
+
+    auto render_ai_select = [&](const std::string& name, game_module::player& player)
+    {
+        ImGui::PushID(name.c_str());
+
+        ImGui::TextColored({0.76f, 0.76f, 0.75f, 1.0f}, "%s", name.c_str());
+        ImGui::Checkbox("chess engine:", &player.m_ai);
+        if(player.is_ai())
+        {
+            ImGui::SameLine();
+            if(game.engine(player.color()).uciok())
+            { ImGui::TextColored({0.0f, 0.8f, 0.0f, 1.0f}, " uciok"); }
+            else
+            { ImGui::TextColored({0.8f, 0.0f, 0.0f, 1.0f}, " not ready"); }
+
+            ImGui::SetNextItemWidth(ImGui::GetWindowSize().x - 96);
+            ImGui::InputText("", player.m_filepath.data(), player.m_filepath.size());
+            ImGui::SameLine();
+            if(ImGui::Button("run"))
+            {
+                auto& engine_ = game.engine(player.color());
+                engine_.print_stdout(true);
+                if(!engine_.execute(player.m_filepath))
+                {
+                    std::cerr << "Couldn't start engine with path " << player.m_filepath << std::endl;
+                }
+            }
+        }
+
+        ImGui::PopID();
+    };
+
+    ImGui::SetNextWindowPos(ImVec2(64, 128));
+    ImGui::SetNextWindowSize(ImVec2(640, 480));
+    ImGui::Begin("New Game", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoTitleBar);
+    {
+        detail::center_text("New Game");
+        ImGui::Separator();
+        render_ai_select("Player White:", game.player_info(chess::white));
+
+        ImGui::Separator();
+        render_ai_select("Player Black:", game.player_info(chess::black));
+
+
+        ImGui::SetCursorPosY(ImGui::GetWindowSize().y - 64);
+        ImGui::Separator();
+        ImGui::SetCursorPosX(ImGui::GetWindowSize().x/2 - (2*148 + 24) / 2);
+
+        bool is_ready_white = !game.player_info(chess::white).is_ai() || (game.player_info(chess::white).is_ai() && game.engine(chess::white).uciok());
+        auto is_ready_black = !game.player_info(chess::black).is_ai() || (game.player_info(chess::black).is_ai() && game.engine(chess::black).uciok());
+
+        if(!is_ready_black || !is_ready_white) { ImGui::BeginDisabled(); }
+        if(ImGui::Button("start", {148, 48}))
+        {
+            auto& statemachine = m_app.states();
+
+            auto game_ok = game.new_game();
+            if(game_ok)
+            {
+                if(game.player_info(chess::white).is_ai())
+                {
+                    statemachine.start(state::ai_turn);
+                }
+                else
+                {
+                    statemachine.handler(state::human_turn).set_params<human_turn_handler>(game.board().player_move());
+                    statemachine.transition(state::human_turn);
+                }
+            }
+            else
+            {
+                std::cerr << "Couldn't start new game. Possible that engine didn't respond to isready command." << std::endl;
+            }
+        }
+        if(!is_ready_black || !is_ready_white) { ImGui::EndDisabled(); }
+        ImGui::SameLine();
+        if(ImGui::Button("exit", {148, 48}))
+        {
+            m_app.render_window().close();
+        }
+    }
+    ImGui::End();
+}
+
+void gui_module::render_gameover()
+{
+    auto& game = m_app.game();
+
+    static constexpr std::array<const char*, static_cast<int>(game_module::result::result_count)> result_strings =
+    {
+            "Black wins by checkmate",
+            "White wins by checkmate",
+            "Black wins - White resigns",
+            "White wins - Black resigns",
+            "Black wins - Timeout White",
+            "White wins - Timeout Black",
+            "Draw - Stalemate",
+            "Draw",
+            "ERROR! No decisive result!"
+};
+
+    ImGui::SetNextWindowPos(ImVec2(128, 256));
+    ImGui::SetNextWindowSize(ImVec2(480, 128));
+    ImGui::Begin("Game Over", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoTitleBar);
+    {
+        detail::center_text(result_strings[static_cast<int>(game.game_result())]);
+        ImGui::Separator();
+
+        ImGui::SetCursorPosY(ImGui::GetWindowSize().y - 64);
+        ImGui::Separator();
+        ImGui::SetCursorPosX(ImGui::GetWindowSize().x/2 - (2*148 + 24) / 2);
+        if(ImGui::Button("new game", {148, 48}))
+        {
+            m_app.states().start(state::new_game);
+        }
+        ImGui::SameLine();
+        if(ImGui::Button("exit", {148, 48}))
+        {
+            m_app.render_window().close();
+        }
     }
     ImGui::End();
 }

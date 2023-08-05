@@ -16,7 +16,7 @@ void human_turn_handler::on_enter()
 
 }
 
-void human_turn_handler::on_update()
+void human_turn_handler::on_update(float dt)
 {
 
 }

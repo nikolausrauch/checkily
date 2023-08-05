@@ -2,6 +2,7 @@
 
 #include "chess_app.h"
 
+#include <cmath>
 #include <iostream>
 
 render_module::render_module(chess_app& app)
@@ -122,7 +123,14 @@ void render_module::render_pieces(chess::square moving_piece_sq)
     }
 }
 
-void render_module::render_piece(chess::piece t_piece, const sf::Vector2f &pos)
+void render_module::render_piece(chess::piece t_piece, const sf::Vector2f& pos)
+{
+    auto& sprite = sprite_piece(t_piece);
+    sprite.setPosition(pos);
+    m_app.render_window().draw(sprite);
+}
+
+void render_module::render_piece_mouse(chess::piece t_piece, const sf::Vector2f &pos)
 {
     auto& sprite = sprite_piece(t_piece);
     sprite.setPosition(pos - (sf::Vector2f(m_app.configs().square_size) * 0.5f * static_cast<float>(m_app.configs().scale_board)));
@@ -198,6 +206,17 @@ sf::Vector2f render_module::world_from_tile(const sf::Vector2i& tile) const
     auto square_size =  sf::Vector2f(configs.square_size) * static_cast<float>(configs.scale_board);
 
     return sf::Vector2f(tile.x * square_size.x, tile.y * square_size.y) + border_offset;
+}
+
+sf::Vector2f render_module::world_interpolate_move(const sf::Vector2f& start, const sf::Vector2f& end, float dt, float speed = 120.0f)
+{
+    sf::Vector2f diff = end - start;
+    float length_diff = std::sqrt(diff.x*diff.x + diff.y*diff.y);
+    auto dir = diff / length_diff;
+
+    sf::Vector2f move = dir * dt * speed;
+    float length_move = std::sqrt(move.x*move.x + move.y*move.y);
+    return length_move > length_diff ? end : start + move;
 }
 
 sf::Vector2i render_module::tile_from_mouse(const sf::Vector2f& mouse_pos) const

@@ -1,7 +1,11 @@
 #include "chess_app.h"
 
+#include "states/ai_turn.h"
+#include "states/ai_move.h"
 #include "states/human_turn.h"
 #include "states/human_move.h"
+#include "states/game_over.h"
+#include "states/new_game.h"
 
 #include <glad/glad.h>
 #include <SFML/OpenGL.hpp>
@@ -33,15 +37,43 @@ chess_app::chess_app(const config& configs)
     m_sound_module = std::make_unique<sound_module>(*this);
     m_gui_module = std::make_unique<gui_module>(*this);
 
+//    // DEBUG
+//    auto& engine_white = m_game_module->engine(chess::white);
+//    engine_white.print_stdout(true);
+//    engine_white.execute("checkily.exe");
+//    engine_white.newgame();
+
+//    auto& engine_black = m_game_module->engine(chess::black);
+//    engine_black.print_stdout(true);
+//    engine_black.execute("stockfish.exe");
+//    engine_black.newgame();
+
+//    if(!engine_white.try_isready(500)) { std::cerr << "engine white is not ready!" << std::endl; }
+//    if(!engine_black.try_isready(500)) { std::cerr << "engine black is not ready!" << std::endl; }
+//    m_game_module->new_game();
+
     /******************** setup states ********************/
     m_state_machine.register_handler<human_turn_handler>(state::human_turn, *this);
     m_state_machine.register_handler<human_move_handler>(state::human_move, *this);
+    m_state_machine.register_handler<ai_turn_handler>(state::ai_turn, *this);
+    m_state_machine.register_handler<ai_move_handler>(state::ai_move, *this);
+    m_state_machine.register_handler<new_game_handler>(state::new_game, *this);
+    m_state_machine.register_handler<game_over_handler>(state::game_over, *this);
 
     m_state_machine.register_transition(state::human_turn, state::human_move);
     m_state_machine.register_transition(state::human_move, state::human_turn);
+    m_state_machine.register_transition(state::human_move, state::ai_turn);
 
-    m_state_machine.handler(state::human_turn).set_params<human_turn_handler>(m_game_module->board().player_move());
-    m_state_machine.start(state::human_turn);
+    m_state_machine.register_transition(state::ai_turn, state::ai_move);
+    m_state_machine.register_transition(state::ai_move, state::human_turn);
+    m_state_machine.register_transition(state::ai_move, state::ai_turn);
+
+    m_state_machine.register_transition(state::new_game, state::human_turn);
+    m_state_machine.register_transition(state::new_game, state::ai_turn);
+    m_state_machine.register_transition(state::ai_move, state::game_over);
+    m_state_machine.register_transition(state::human_move, state::game_over);
+
+    m_state_machine.start(state::new_game);
 }
 
 const chess_app::config& chess_app::configs()
@@ -110,7 +142,7 @@ void chess_app::run()
         }
 
         float dt = timer.restart().asSeconds();
-        m_state_machine.current_handler().on_update();
+        m_state_machine.current_handler().on_update(dt);
 
         m_window.clear(sf::Color(39, 37, 34));
         {

@@ -24,7 +24,10 @@ public:
     void end();
 
     void render_gameinfo();
-    void render_playerinfo(const game_module::Player& player, const sf::Vector2f& pos);
+    void render_playerinfo(const game_module::player& player, const sf::Vector2f& pos);
+
+    void render_newgame();
+    void render_gameover();
 
 private:
     void render_sprite(const sf::Sprite& sprite, const sf::Vector2f& size);

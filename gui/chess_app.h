@@ -53,7 +53,7 @@ private:
     std::unique_ptr<render_module> m_render_module;
     std::unique_ptr<game_module> m_game_module;
     std::unique_ptr<sound_module> m_sound_module;
-    std::unique_ptr<gui_module> m_gui_module;
+    std::unique_ptr<gui_module> m_gui_module;;
 
     state_machine<state> m_state_machine;
 };

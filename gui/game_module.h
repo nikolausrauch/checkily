@@ -1,5 +1,7 @@
 #pragma once
 
+#include "uci/process.h"
+
 #include <chess/chess.h>
 #include <chess/board.h>
 #include <chess/move.h>
@@ -11,61 +13,81 @@ class chess_app;
 class game_module
 {
 public:
-    enum class mode
+    struct player
     {
-        human_vs_human,
-        human_vs_ai,
-        ai_vs_ai
-    };
+        player(const std::string& name, chess::color color);
 
-    struct Player
-    {
+        const std::string& name() const;
+        const std::array<unsigned short, chess::piece_count>& captured() const;
+        const sf::Time& time() const;
+        chess::color color() const;
+        bool is_ai() const;
+
+    private:
+        bool new_game(uci_process& engine);
+
+    private:
         std::string m_name{"Player"};
         std::array<unsigned short, chess::piece_count> m_captured;
         sf::Time m_time;
         chess::color m_color;
+
+        bool m_ai;
+        std::string m_filepath;
+
+        friend class game_module;
+        friend class gui_module;
     };
 
-    struct Record
+    enum class result : int
     {
-        chess::move m_move;
-        bool m_check;
-        bool m_checkmate;
+        checkmate_white = 0,
+        checkmate_black,
+        resign_white,
+        resign_black,
+        timeout_white,
+        timeout_black,
+        stalemate,
+        draw,
+        unknown,
+        result_count = unknown + 1
     };
 
 public:
     game_module(chess_app& app);
 
-    void start_position();
-    void game_mode(mode play_mode);
+    bool new_game();
 
-    void make_move(chess::move move);
+    result make_move(chess::move move);
 
     chess::game_board& board();
     const chess::game_board& board() const;
-    const std::vector<Record>& moves() const;
-    mode game_mode() const;
+    const chess::game_record& moves() const;
+    result game_result() const;
 
-    const Player& player_white() const;
-    const Player& player_black() const;
+    player& player_info(chess::color color);
+    const player& player_info(chess::color color) const;
 
-    const int material_imbalance(const Player& me);
+    uci_process& engine(chess::color color);
+    uci_process& eval_engine();
+
+    const int material_imbalance(chess::color color);
 
     const std::array<chess::piece, chess::square_count>& board_pieces() const;
     chess::move_list piece_moves(chess::piece piece, chess::square square) const;
 
 private:
     void update_pieces();
+    result check_onboard_result();
 
 private:
     chess_app& m_app;
 
+    result m_game_result;
     chess::game_board m_board;
+    chess::game_record m_moves;
     std::array<chess::piece, chess::square_count> m_board_pieces;
-    std::vector<Record> m_moves;
 
-    Player m_white;
-    Player m_black;
-
-    mode m_game_mode;
+    std::array<uci_process, 3> m_engines;
+    std::array<player, chess::player_count> m_players;
 };

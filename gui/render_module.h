@@ -42,6 +42,7 @@ public:
     void render_board();
     void render_pieces(chess::square moving_piece_sq = chess::square::not_a_square);
     void render_piece(chess::piece t_piece, const sf::Vector2f& pos);
+    void render_piece_mouse(chess::piece t_piece, const sf::Vector2f& pos);
     void render_moves(const chess::move_list& t_moves);
     void render_square_hover(const sf::Vector2f& pos);
     void render_square_select(chess::square t_sq);
@@ -52,6 +53,7 @@ public:
 
     sf::Vector2f world_from_square(const chess::square t_square) const;
     sf::Vector2f world_from_tile(const sf::Vector2i& tile) const;
+    sf::Vector2f world_interpolate_move(const sf::Vector2f& start, const sf::Vector2f& end, float dt, float speed);
 
     sf::Vector2i tile_from_mouse(const sf::Vector2f& mouse_pos) const;
     chess::square square_from_mouse(const sf::Vector2f& mouse_pos) const;

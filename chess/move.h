@@ -57,6 +57,14 @@ constexpr move encode_move(const int from, const int to, const int man, const in
     };
 }
 
+struct record
+{
+    chess::move m_move;
+    bool m_check;
+    bool m_checkmate;
+};
+
+using game_record = std::vector<record>;
 using move_list = std::vector<move>;
 inline static constexpr chess::move illegal_move = chess::encode_move(0, 0, 0, 0, 0, 0);
 

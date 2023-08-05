@@ -46,6 +46,14 @@ set( GAME_SRC
 
     "${CMAKE_CURRENT_SOURCE_DIR}/states/human_turn.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/states/human_move.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/states/ai_turn.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/states/ai_move.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/states/new_game.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/states/game_over.cpp"
+
+
+    "${CMAKE_CURRENT_SOURCE_DIR}/uci/process.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/uci/windows_process.cpp"
 )
 
 set( GAME_HDR
@@ -59,6 +67,15 @@ set( GAME_HDR
     "${CMAKE_CURRENT_SOURCE_DIR}/states/state.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/states/human_turn.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/states/human_move.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/states/ai_turn.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/states/ai_move.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/states/new_game.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/states/game_over.h"
+
+
+    "${CMAKE_CURRENT_SOURCE_DIR}/uci/process.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/uci/windows_process.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/uci/safe_queue.h"
 )
 
 source_group( TREE ${CMAKE_CURRENT_SOURCE_DIR}
