@@ -11,20 +11,24 @@ I implemented it specifically to test and play against **checkily**, but it shou
    -  [x] show all possible moves
    -  [x] show captured pieces
    -  [X] show moves in algebraic notation
+   -  [x] new game and game over menu
+   -  [ ] promotion selection
    -  [ ] chess clock
 -  [ ] application 
    -  [x] generic piece and board graphics 
    -  [X] sound support
    -  [ ] PGN/FEN export and import
    -  [ ] explore previous moves
-   -  [ ] interface uci engines
+   -  [x] interface uci engines
+   -  [ ] uci engine options 
    -  [ ] evaluation meter
--  [ ] game modes 
+-  [x] game modes 
    -  [x] human vs. human
-   -  [ ] ai vs. human
-   -  [ ] ai vs. ai
+   -  [x] ai vs. human
+   -  [x] ai vs. ai
 
 # How to play
 
-Start the gui from the console or by clicking on the executable. Make sure that the assets folder is in the working directory.   
-![](https://github.com/nikolausrauch/checkily/assets/13553309/4696691a-8788-467d-b538-53d5ce5673b0)
+Start the executable and make sure that the assets folder is in the working directory.   
+Specify the relative path to a uci chess engine and click on run to execute it.
+![](https://github.com/nikolausrauch/checkily/assets/13553309/b5f4e833-5149-4feb-bb30-16d839c46b28)
