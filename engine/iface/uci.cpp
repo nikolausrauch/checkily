@@ -147,7 +147,7 @@ void uci::run()
             //                    white increment per move in mseconds if x > 0
             //                * binc <x>
             //                    black increment per move in mseconds if x > 0
-            //                * movestogo <x>
+            //                * movestogo <x>partial_msg
             //                  there are x moves to the next time control,
             //                    this will only be sent if x > 0,
             //                    if you don't get this and get the wtime and btime it's sudden death

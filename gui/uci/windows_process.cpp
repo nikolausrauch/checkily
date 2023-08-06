@@ -100,7 +100,7 @@ bool windows_process::recv(std::string& msg)
     if(!alive()) { return false; }
 
     msg.clear();
-    msg.resize(4096);
+    msg.resize(256);
     DWORD bytes_read{0};
     return ReadFile(m_std_out_read, msg.data(), msg.size(), &bytes_read, nullptr) && bytes_read > 0;
 }

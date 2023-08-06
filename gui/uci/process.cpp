@@ -202,6 +202,8 @@ void uci_process::writer()
 
 void uci_process::reader()
 {
+    std::string buffer;
+
     do
     {
 
@@ -213,35 +215,17 @@ void uci_process::reader()
         std::string msg;
         if(m_os_process->recv(msg))
         {
-            if(m_print_stdout) { std::cout << msg << std::endl; }
-            parse_response(msg);
+            buffer += msg;
+            auto finnished_msg = ckly::iface::strip_msg(buffer);
+
+            if(!finnished_msg.empty())
+            {
+                if(m_print_stdout) { std::cout << finnished_msg; }
+                parse_response(finnished_msg);
+            }
         }
 
     } while(!m_shutdown.load());
-}
-
-namespace detail
-{
-
-std::vector<std::string> tokenize(const std::string &t_input)
-{
-    const std::regex pattern("\\S+");
-    std::vector<std::string> tokens(std::sregex_token_iterator(t_input.begin(), t_input.end(), pattern),
-                                    std::sregex_token_iterator());
-
-    return tokens;
-}
-
-chess::square to_square(char file, char rank)
-{
-    auto file_ = file - 'a';
-    auto rank_ = rank - '1';
-
-    if(0 > file_ || file_ > 7 || 0 > rank_ || rank_ > 7) {  return chess::square::not_a_square; }
-
-    return static_cast<chess::square>( (7-rank_)*8 + file_);
-}
-
 }
 
 void uci_process::parse_response(const std::string& msg)
@@ -251,7 +235,7 @@ void uci_process::parse_response(const std::string& msg)
     std::string input;
     while (std::getline(iss, input))
     {
-        auto tokens = detail::tokenize(input);
+        auto tokens = ckly::iface::tokenize(input);
         if(tokens.empty()) continue;
 
         if(tokens[0] == "bestmove" && tokens.size() >= 2)

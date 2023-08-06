@@ -17,4 +17,7 @@ chess::square to_square(char file, char rank);
 std::string parse_move(const chess::move mv);
 chess::move parse_move(const std::string &mv, const chess::game_board& board);
 
+void sanitize_msg(std::string& msg);
+std::string strip_msg(std::string& msg);
+
 }

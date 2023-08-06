@@ -190,7 +190,7 @@ bool game_module::player::new_game(uci_process& engine)
         m_name = engine.name();
         engine.newgame();
         engine.newgame();
-        if(!engine.try_isready(1000))
+        if(!engine.try_isready(2000))
         {
             return false;
         }

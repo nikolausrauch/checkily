@@ -37,21 +37,6 @@ chess_app::chess_app(const config& configs)
     m_sound_module = std::make_unique<sound_module>(*this);
     m_gui_module = std::make_unique<gui_module>(*this);
 
-//    // DEBUG
-//    auto& engine_white = m_game_module->engine(chess::white);
-//    engine_white.print_stdout(true);
-//    engine_white.execute("checkily.exe");
-//    engine_white.newgame();
-
-//    auto& engine_black = m_game_module->engine(chess::black);
-//    engine_black.print_stdout(true);
-//    engine_black.execute("stockfish.exe");
-//    engine_black.newgame();
-
-//    if(!engine_white.try_isready(500)) { std::cerr << "engine white is not ready!" << std::endl; }
-//    if(!engine_black.try_isready(500)) { std::cerr << "engine black is not ready!" << std::endl; }
-//    m_game_module->new_game();
-
     /******************** setup states ********************/
     m_state_machine.register_handler<human_turn_handler>(state::human_turn, *this);
     m_state_machine.register_handler<human_move_handler>(state::human_move, *this);

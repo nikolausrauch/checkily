@@ -76,4 +76,28 @@ std::string parse_move(const chess::move mv)
     return std::string(chess::square_names[mv.m_from]) + chess::square_names[mv.m_to] + prom_char;
 }
 
+void sanitize_msg(std::string& msg)
+{
+    msg.erase( std::remove_if(msg.begin(), msg.end(), [](char ch)
+    {
+        return !(std::isprint(static_cast<unsigned char>(ch)) || ch == '\n' || ch == '\r');
+    }), msg.end());
+}
+
+std::string strip_msg(std::string& msg)
+{
+    /* TODO: this is really wierd, but I have some issues with the output from pipes */
+    sanitize_msg(msg);
+    auto last_newline = msg.find_last_of('\n');
+
+    if(last_newline != std::string::npos)
+    {
+        auto sub_str = msg.substr(0, last_newline);
+        msg = msg.substr(last_newline + 1, msg.find_first_of('\0'));
+        return sub_str;
+    }
+
+    return {};
+}
+
 }
