@@ -36,7 +36,7 @@ public:
         std::string m_filepath;
 
         friend class game_module;
-        friend class gui_module;
+        friend class new_game_handler;
     };
 
     enum class result : int

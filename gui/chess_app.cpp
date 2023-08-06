@@ -6,6 +6,7 @@
 #include "states/human_move.h"
 #include "states/game_over.h"
 #include "states/new_game.h"
+#include "states/promotion.h"
 
 #include <glad/glad.h>
 #include <SFML/OpenGL.hpp>
@@ -44,19 +45,27 @@ chess_app::chess_app(const config& configs)
     m_state_machine.register_handler<ai_move_handler>(state::ai_move, *this);
     m_state_machine.register_handler<new_game_handler>(state::new_game, *this);
     m_state_machine.register_handler<game_over_handler>(state::game_over, *this);
+    m_state_machine.register_handler<promotion_handler>(state::promotion, *this);
 
+    /******************** setup state transitions ********************/
     m_state_machine.register_transition(state::human_turn, state::human_move);
+
     m_state_machine.register_transition(state::human_move, state::human_turn);
+    m_state_machine.register_transition(state::human_move, state::promotion);
     m_state_machine.register_transition(state::human_move, state::ai_turn);
+    m_state_machine.register_transition(state::human_move, state::game_over);
+
+    m_state_machine.register_transition(state::promotion, state::human_turn);
+    m_state_machine.register_transition(state::promotion, state::ai_turn);
+    m_state_machine.register_transition(state::promotion, state::game_over);
 
     m_state_machine.register_transition(state::ai_turn, state::ai_move);
     m_state_machine.register_transition(state::ai_move, state::human_turn);
     m_state_machine.register_transition(state::ai_move, state::ai_turn);
+    m_state_machine.register_transition(state::ai_move, state::game_over);
 
     m_state_machine.register_transition(state::new_game, state::human_turn);
     m_state_machine.register_transition(state::new_game, state::ai_turn);
-    m_state_machine.register_transition(state::ai_move, state::game_over);
-    m_state_machine.register_transition(state::human_move, state::game_over);
 
     m_state_machine.start(state::new_game);
 }

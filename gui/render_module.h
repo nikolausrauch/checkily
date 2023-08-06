@@ -42,6 +42,7 @@ public:
     void render_board();
     void render_pieces(chess::square moving_piece_sq = chess::square::not_a_square);
     void render_piece(chess::piece t_piece, const sf::Vector2f& pos);
+    void render_piece(chess::piece piece, chess::square sq);
     void render_piece_mouse(chess::piece t_piece, const sf::Vector2f& pos);
     void render_moves(const chess::move_list& t_moves);
     void render_square_hover(const sf::Vector2f& pos);

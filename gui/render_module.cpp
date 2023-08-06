@@ -130,6 +130,15 @@ void render_module::render_piece(chess::piece t_piece, const sf::Vector2f& pos)
     m_app.render_window().draw(sprite);
 }
 
+void render_module::render_piece(chess::piece piece, chess::square sq)
+{
+    auto& render_window = m_app.render_window();
+
+    auto& sprite = m_sprite_pieces[piece];
+    sprite.setPosition( world_from_square(static_cast<chess::square>(sq)) );
+    render_window.draw(sprite);
+}
+
 void render_module::render_piece_mouse(chess::piece t_piece, const sf::Vector2f &pos)
 {
     auto& sprite = sprite_piece(t_piece);

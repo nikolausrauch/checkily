@@ -50,6 +50,7 @@ set( GAME_SRC
     "${CMAKE_CURRENT_SOURCE_DIR}/states/ai_move.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/states/new_game.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/states/game_over.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/states/promotion.cpp"
 
 
     "${CMAKE_CURRENT_SOURCE_DIR}/uci/process.cpp"
@@ -71,6 +72,7 @@ set( GAME_HDR
     "${CMAKE_CURRENT_SOURCE_DIR}/states/ai_move.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/states/new_game.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/states/game_over.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/states/promotion.h"
 
 
     "${CMAKE_CURRENT_SOURCE_DIR}/uci/process.h"

@@ -5,6 +5,7 @@
 #include "gui/chess_app.h"
 #include "gui/render_module.h"
 #include "states/human_turn.h"
+#include "states/promotion.h"
 
 human_move_handler::human_move_handler(chess_app& app)
     : m_app(app)
@@ -54,6 +55,13 @@ void human_move_handler::on_event(const sf::Event& event)
         if(it == m_possible_moves.end())
         {
             statemachine.transition(state::human_turn);
+            return;
+        }
+
+        if( (*it).m_promote != chess::not_a_piece )
+        {
+            statemachine.handler(state::promotion).set_params<promotion_handler>((*it));
+            statemachine.transition(state::promotion);
             return;
         }
 

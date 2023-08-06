@@ -26,11 +26,9 @@ public:
     void render_gameinfo();
     void render_playerinfo(const game_module::player& player, const sf::Vector2f& pos);
 
-    void render_newgame();
-    void render_gameover();
-
-private:
     void render_sprite(const sf::Sprite& sprite, const sf::Vector2f& size);
+    bool render_sprite_button(const sf::Sprite& sprite, const sf::Vector2f& size, const char* id = "##legacy_imgui");
+    void render_center_text(const std::string& text);
 
 private:
     chess_app& m_app;

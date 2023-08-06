@@ -20,18 +20,6 @@
 #include <imgui/imgui.h>
 #include <iostream>
 
-namespace detail
-{
-
-void center_text(const std::string& text)
-{
-    auto windowWidth = ImGui::GetWindowSize().x;
-    auto textWidth   = ImGui::CalcTextSize(text.c_str()).x;
-    ImGui::SetCursorPosX((windowWidth - textWidth) * 0.5f);
-    ImGui::Text("%s", text.c_str());
-}
-
-}
 
 gui_module::gui_module(chess_app& app)
     : m_app(app),
@@ -397,133 +385,6 @@ void gui_module::render_playerinfo(const game_module::player& player, const sf::
     ImGui::End();
 }
 
-void gui_module::render_newgame()
-{
-    auto& game = m_app.game();
-
-    auto render_ai_select = [&](const std::string& name, game_module::player& player)
-    {
-        ImGui::PushID(name.c_str());
-
-        ImGui::TextColored({0.76f, 0.76f, 0.75f, 1.0f}, "%s", name.c_str());
-        ImGui::Checkbox("chess engine:", &player.m_ai);
-        if(player.is_ai())
-        {
-            ImGui::SameLine();
-            if(game.engine(player.color()).uciok())
-            { ImGui::TextColored({0.0f, 0.8f, 0.0f, 1.0f}, " uciok"); }
-            else
-            { ImGui::TextColored({0.8f, 0.0f, 0.0f, 1.0f}, " not ready"); }
-
-            ImGui::SetNextItemWidth(ImGui::GetWindowSize().x - 96);
-            ImGui::InputText("", player.m_filepath.data(), player.m_filepath.size());
-            ImGui::SameLine();
-            if(ImGui::Button("run"))
-            {
-                auto& engine_ = game.engine(player.color());
-                engine_.print_stdout(true);
-                if(!engine_.execute(player.m_filepath))
-                {
-                    std::cerr << "Couldn't start engine with path " << player.m_filepath << std::endl;
-                }
-            }
-        }
-
-        ImGui::PopID();
-    };
-
-    ImGui::SetNextWindowPos(ImVec2(64, 128));
-    ImGui::SetNextWindowSize(ImVec2(640, 480));
-    ImGui::Begin("New Game", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoTitleBar);
-    {
-        detail::center_text("New Game");
-        ImGui::Separator();
-        render_ai_select("Player White:", game.player_info(chess::white));
-
-        ImGui::Separator();
-        render_ai_select("Player Black:", game.player_info(chess::black));
-
-
-        ImGui::SetCursorPosY(ImGui::GetWindowSize().y - 64);
-        ImGui::Separator();
-        ImGui::SetCursorPosX(ImGui::GetWindowSize().x/2 - (2*148 + 24) / 2);
-
-        bool is_ready_white = !game.player_info(chess::white).is_ai() || (game.player_info(chess::white).is_ai() && game.engine(chess::white).uciok());
-        auto is_ready_black = !game.player_info(chess::black).is_ai() || (game.player_info(chess::black).is_ai() && game.engine(chess::black).uciok());
-
-        if(!is_ready_black || !is_ready_white) { ImGui::BeginDisabled(); }
-        if(ImGui::Button("start", {148, 48}))
-        {
-            auto& statemachine = m_app.states();
-
-            auto game_ok = game.new_game();
-            if(game_ok)
-            {
-                if(game.player_info(chess::white).is_ai())
-                {
-                    statemachine.start(state::ai_turn);
-                }
-                else
-                {
-                    statemachine.handler(state::human_turn).set_params<human_turn_handler>(game.board().player_move());
-                    statemachine.transition(state::human_turn);
-                }
-            }
-            else
-            {
-                std::cerr << "Couldn't start new game. Possible that engine didn't respond to isready command." << std::endl;
-            }
-        }
-        if(!is_ready_black || !is_ready_white) { ImGui::EndDisabled(); }
-        ImGui::SameLine();
-        if(ImGui::Button("exit", {148, 48}))
-        {
-            m_app.render_window().close();
-        }
-    }
-    ImGui::End();
-}
-
-void gui_module::render_gameover()
-{
-    auto& game = m_app.game();
-
-    static constexpr std::array<const char*, static_cast<int>(game_module::result::result_count)> result_strings =
-    {
-            "Black wins by checkmate",
-            "White wins by checkmate",
-            "Black wins - White resigns",
-            "White wins - Black resigns",
-            "Black wins - Timeout White",
-            "White wins - Timeout Black",
-            "Draw - Stalemate",
-            "Draw",
-            "ERROR! No decisive result!"
-};
-
-    ImGui::SetNextWindowPos(ImVec2(128, 256));
-    ImGui::SetNextWindowSize(ImVec2(480, 128));
-    ImGui::Begin("Game Over", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoTitleBar);
-    {
-        detail::center_text(result_strings[static_cast<int>(game.game_result())]);
-        ImGui::Separator();
-
-        ImGui::SetCursorPosY(ImGui::GetWindowSize().y - 64);
-        ImGui::Separator();
-        ImGui::SetCursorPosX(ImGui::GetWindowSize().x/2 - (2*148 + 24) / 2);
-        if(ImGui::Button("new game", {148, 48}))
-        {
-            m_app.states().start(state::new_game);
-        }
-        ImGui::SameLine();
-        if(ImGui::Button("exit", {148, 48}))
-        {
-            m_app.render_window().close();
-        }
-    }
-    ImGui::End();
-}
-
 void gui_module::render_sprite(const sf::Sprite& sprite, const sf::Vector2f& size)
 {
     ImVec2 tex_size = ImVec2(sprite.getTexture()->getSize().x, sprite.getTexture()->getSize().y);
@@ -533,4 +394,23 @@ void gui_module::render_sprite(const sf::Sprite& sprite, const sf::Vector2f& siz
     ImVec2 uv_end = ImVec2( (tex_rect.left + tex_rect.width) / tex_size.x, (tex_rect.top + tex_rect.height) / tex_size.y);
 
     ImGui::Image(reinterpret_cast<void*>(sprite.getTexture()->getNativeHandle()), ImVec2{size.x, size.y}, uv_start, uv_end);
+}
+
+bool gui_module::render_sprite_button(const sf::Sprite& sprite, const sf::Vector2f& size, const char* id)
+{
+    ImVec2 tex_size = ImVec2(sprite.getTexture()->getSize().x, sprite.getTexture()->getSize().y);
+
+    auto tex_rect = sprite.getTextureRect();
+    ImVec2 uv_start = ImVec2(tex_rect.left / tex_size.x, tex_rect.top / tex_size.y);
+    ImVec2 uv_end = ImVec2( (tex_rect.left + tex_rect.width) / tex_size.x, (tex_rect.top + tex_rect.height) / tex_size.y);
+
+    return ImGui::ImageButton(id, reinterpret_cast<void*>(sprite.getTexture()->getNativeHandle()), ImVec2{size.x, size.y}, uv_start, uv_end);
+}
+
+void gui_module::render_center_text(const std::string& text)
+{
+    auto windowWidth = ImGui::GetWindowSize().x;
+    auto textWidth   = ImGui::CalcTextSize(text.c_str()).x;
+    ImGui::SetCursorPosX((windowWidth - textWidth) * 0.5f);
+    ImGui::Text("%s", text.c_str());
 }

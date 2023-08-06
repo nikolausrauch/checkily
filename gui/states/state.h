@@ -9,7 +9,8 @@ enum class state
     ai_move,
 
     new_game,
-    game_over
+    game_over,
+    promotion
 };
 
 class chess_app;
