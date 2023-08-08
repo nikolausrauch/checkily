@@ -42,6 +42,11 @@ void new_game_handler::on_render()
 
 void new_game_handler::on_gui()
 {
+    render_newgame();
+}
+
+void new_game_handler::render_newgame()
+{
     auto& gui = m_app.gui();
     gui.render_gameinfo();
 
@@ -77,6 +82,9 @@ void new_game_handler::on_gui()
 
         ImGui::PopID();
     };
+
+    ImGui::PushStyleColor(ImGuiCol_Border, {0.137, 0.243, 0.365, 1.0});
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 8);
 
     ImGui::SetNextWindowPos(ImVec2(64, 128));
     ImGui::SetNextWindowSize(ImVec2(640, 480));
@@ -128,4 +136,12 @@ void new_game_handler::on_gui()
         }
     }
     ImGui::End();
+
+    ImGui::PopStyleVar();
+    ImGui::PopStyleColor();
+}
+
+void new_game_handler::render_engine_settings()
+{
+    /* TODO: engine options */
 }

@@ -15,5 +15,9 @@ public:
     void on_gui();
 
 private:
+    void render_newgame();
+    void render_engine_settings();
+
+private:
     chess_app& m_app;
 };

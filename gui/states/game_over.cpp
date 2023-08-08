@@ -57,6 +57,9 @@ void game_over_handler::on_gui()
             "ERROR! No decisive result!"
     };
 
+    ImGui::PushStyleColor(ImGuiCol_Border, {0.137, 0.243, 0.365, 1.0});
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 8);
+
     ImGui::SetNextWindowPos(ImVec2(128, 256));
     ImGui::SetNextWindowSize(ImVec2(480, 128));
     ImGui::Begin("Game Over", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoTitleBar);
@@ -78,4 +81,7 @@ void game_over_handler::on_gui()
         }
     }
     ImGui::End();
+
+    ImGui::PopStyleVar();
+    ImGui::PopStyleColor();
 }

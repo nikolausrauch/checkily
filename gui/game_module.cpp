@@ -16,6 +16,7 @@ game_module::game_module(chess_app &app)
 bool game_module::new_game()
 {
     chess::load_fen(m_board, chess::fen_startposition);
+
     update_pieces();
 
     m_game_result = result::unknown;
@@ -132,16 +133,18 @@ void game_module::update_pieces()
 
 game_module::result game_module::check_onboard_result()
 {
-    if(m_board.check_mate())
-    {
-        m_game_result = m_board.player_move() == chess::white ? result::checkmate_white : result::checkmate_black;
-        return m_game_result;
-    }
-
     auto moves = chess::generate_legal_moves(m_board);
-    if(moves.empty() && !m_board.check_mate())
+    if(moves.empty())
     {
-        m_game_result = result::stalemate;
+        if(m_board.check())
+        {
+            m_game_result = m_board.player_move() == chess::white ? result::checkmate_white : result::checkmate_black;
+        }
+        else
+        {
+            m_game_result = result::stalemate;
+        }
+
         return m_game_result;
     }
 
